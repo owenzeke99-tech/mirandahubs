@@ -1,0 +1,244 @@
+-- Configuration
+local CorrectKey = "MiranDaHubKeyHdiehBsiwibesoHdieoejkdoebejb"
+local LinkGetKey = "https://link4m.net/gtUlP"
+local FileName = "MirandaHub_KeyCache.json"
+
+-- Hàm kiểm tra Key đã lưu trong 24 giờ hay chưa
+local function CheckSavedKey()
+    if isfile and readfile and isfile(FileName) then
+        local success, data = pcall(function()
+            return game:GetService("HttpService"):JSONDecode(readfile(FileName))
+        end)
+        if success and data and data.key == CorrectKey then
+            -- Kiểm tra thời gian (24 giờ = 86400 giây)
+            if os.time() - data.time < 86400 then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+-- Hàm lưu Key lại kèm theo timestamp hiện tại
+local function SaveKey()
+    if writefile then
+        local data = {
+            key = CorrectKey,
+            time = os.time()
+        }
+        pcall(function()
+            writefile(FileName, game:GetService("HttpService"):JSONEncode(data))
+        end)
+    end
+end
+
+-- Nếu Key đã được lưu và hợp lệ, bỏ qua bảng Key và load thẳng script chính
+if CheckSavedKey() then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/mirandaafk.lua"))()
+    return
+end
+
+-- Khởi tạo GUI nếu chưa có hoặc đã hết hạn 24h
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local MainStroke = Instance.new("UIStroke")
+local TopBar = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local AccentLine = Instance.new("Frame")
+local TextBox = Instance.new("TextBox")
+local TextBoxCorner = Instance.new("UICorner")
+local TextBoxStroke = Instance.new("UIStroke")
+local SubmitButton = Instance.new("TextButton")
+local ButtonCorner = Instance.new("UICorner")
+local GetKeyButton = Instance.new("TextButton")
+local GetKeyCorner = Instance.new("UICorner")
+local ErrorLabel = Instance.new("TextLabel")
+
+-- Protect GUI from detection/removal
+ScreenGui.Name = "MirandaHubV3_KeySystem"
+if syn and syn.protect_gui then
+    syn.protect_gui(ScreenGui)
+    ScreenGui.Parent = game.CoreGui
+elseif gethui then
+    ScreenGui.Parent = gethui()
+else
+    ScreenGui.Parent = game.CoreGui
+end
+
+-- Main Frame (Centered with AnchorPoint for smooth animation)
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+MainFrame.Size = UDim2.new(0, 350, 0, 220)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+UICorner.Parent = MainFrame
+UICorner.CornerRadius = UDim.new(0, 10)
+
+MainStroke.Parent = MainFrame
+MainStroke.Color = Color3.fromRGB(220, 20, 60)
+MainStroke.Thickness = 1.5
+
+-- Top Bar / Title
+TopBar.Name = "TopBar"
+TopBar.Parent = MainFrame
+TopBar.BackgroundTransparency = 1
+TopBar.Size = UDim2.new(1, 0, 0, 45)
+
+Title.Parent = TopBar
+Title.BackgroundTransparency = 1
+Title.Size = UDim2.new(1, 0, 1, 0)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "MIRANDA HUB V3"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 18
+
+-- Red Divider Accent Line
+AccentLine.Parent = MainFrame
+AccentLine.BackgroundColor3 = Color3.fromRGB(220, 20, 60)
+AccentLine.BorderSizePixel = 0
+AccentLine.Position = UDim2.new(0.05, 0, 0, 45)
+AccentLine.Size = UDim2.new(0.9, 0, 0, 2)
+
+-- Text Box (Input Key)
+TextBox.Parent = MainFrame
+TextBox.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+TextBox.Position = UDim2.new(0.08, 0, 0, 65)
+TextBox.Size = UDim2.new(0.84, 0, 0, 42)
+TextBox.Font = Enum.Font.GothamBold
+TextBox.PlaceholderText = "Enter your key here..."
+TextBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
+TextBox.Text = ""
+TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextBox.TextSize = 13
+TextBox.ClearTextOnFocus = false
+
+TextBoxCorner.Parent = TextBox
+TextBoxCorner.CornerRadius = UDim.new(0, 8)
+
+TextBoxStroke.Parent = TextBox
+TextBoxStroke.Color = Color3.fromRGB(50, 50, 50)
+TextBoxStroke.Thickness = 1
+
+-- Status / Error Message Label
+ErrorLabel.Parent = MainFrame
+ErrorLabel.BackgroundTransparency = 1
+ErrorLabel.Position = UDim2.new(0.08, 0, 0, 115)
+ErrorLabel.Size = UDim2.new(0.84, 0, 0, 20)
+ErrorLabel.Font = Enum.Font.GothamBold
+ErrorLabel.Text = ""
+ErrorLabel.TextColor3 = Color3.fromRGB(255, 75, 75)
+ErrorLabel.TextSize = 12
+
+-- Submit Button
+SubmitButton.Parent = MainFrame
+SubmitButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+SubmitButton.Position = UDim2.new(0.08, 0, 0, 145)
+SubmitButton.Size = UDim2.new(0.49, -5, 0, 38)
+SubmitButton.Font = Enum.Font.GothamBold
+SubmitButton.Text = "SUBMIT"
+SubmitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+SubmitButton.TextSize = 13
+
+ButtonCorner.Parent = SubmitButton
+ButtonCorner.CornerRadius = UDim.new(0, 8)
+
+-- Get Key Button
+GetKeyButton.Parent = MainFrame
+GetKeyButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+GetKeyButton.Position = UDim2.new(0.59, 5, 0, 145)
+GetKeyButton.Size = UDim2.new(0.33, -5, 0, 38)
+GetKeyButton.Font = Enum.Font.GothamBold
+GetKeyButton.Text = "GET KEY"
+GetKeyButton.TextColor3 = Color3.fromRGB(200, 200, 200)
+GetKeyButton.TextSize = 13
+
+GetKeyCorner.Parent = GetKeyButton
+GetKeyCorner.CornerRadius = UDim.new(0, 8)
+
+-- Smooth Hover Effects
+SubmitButton.MouseEnter:Connect(function()
+    SubmitButton.BackgroundColor3 = Color3.fromRGB(230, 20, 20)
+end)
+SubmitButton.MouseLeave:Connect(function()
+    SubmitButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+end)
+
+GetKeyButton.MouseEnter:Connect(function()
+    GetKeyButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    GetKeyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+end)
+GetKeyButton.MouseLeave:Connect(function()
+    GetKeyButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    GetKeyButton.TextColor3 = Color3.fromRGB(200, 200, 200)
+end)
+
+-- Ultra-Smooth Sine-Wave Shake Animation
+local function SmoothShake()
+    local startTime = tick()
+    local duration = 0.35
+    local intensity = 10
+    local frequency = 35
+    
+    local connection
+    connection = game:GetService("RunService").RenderStepped:Connect(function()
+        local elapsed = tick() - startTime
+        if elapsed < duration then
+            local progress = 1 - (elapsed / duration)
+            local offsetX = math.sin(elapsed * frequency) * intensity * progress
+            MainFrame.Position = UDim2.new(0.5, offsetX, 0.5, 0)
+        else
+            MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+            connection:Disconnect()
+        end
+    end)
+end
+
+-- Smooth Text Clearing Effect
+local function SmoothClearText()
+    local currentText = TextBox.Text
+    while #currentText > 0 do
+        currentText = string.sub(currentText, 1, #currentText - 1)
+        TextBox.Text = currentText
+        task.wait(0.02)
+    end
+end
+
+-- Get Key Button Event
+GetKeyButton.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard(LinkGetKey)
+        ErrorLabel.TextColor3 = Color3.fromRGB(0, 220, 255)
+        ErrorLabel.Text = "Get Key link copied to clipboard!"
+    else
+        ErrorLabel.TextColor3 = Color3.fromRGB(255, 75, 75)
+        ErrorLabel.Text = "Your executor does not support clipboard!"
+    end
+end)
+
+-- Submit Button Event
+SubmitButton.MouseButton1Click:Connect(function()
+    if TextBox.Text == CorrectKey then
+        ErrorLabel.TextColor3 = Color3.fromRGB(50, 255, 100)
+        ErrorLabel.Text = "Correct Key! Loading Hub..."
+        
+        -- Lưu key vào tệp cấu hình 24h
+        SaveKey()
+        
+        task.wait(1)
+        
+        ScreenGui:Destroy()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/mirandaafk.lua"))()
+    else
+        ErrorLabel.TextColor3 = Color3.fromRGB(255, 75, 75)
+        ErrorLabel.Text = "Invalid Key! Please try again."
+        
+        coroutine.wrap(SmoothShake)()
+        task.wait(0.2)
+        coroutine.wrap(SmoothClearText)()
+    end
+end)
